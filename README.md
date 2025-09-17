@@ -1,14 +1,15 @@
 # gsheet-colour-cell
 
-A collection of utility functions for Google Spreadsheet operations, with a focus on cell colouring and formatting based on values.
+A Google Apps Script utility that automatically applies colors and formatting to spreadsheet cells based on their values. The script uses MD5 hashing to ensure consistent coloring - the same value will always get the same color and formatting.
 
 ## Features
 
-- Color cells based on their values
-- Apply conditional formatting to ranges
-- Manage sheet operations
-- Bulk data operations
-- Error handling and validation
+- **Consistent Color Mapping**: Same cell values always get the same colors using MD5 hashing
+- **Random Color Generation**: Uses a palette of 32 web-safe pastel colors
+- **Automatic Text Contrast**: Generates contrasting text colors for readability
+- **Random Text Formatting**: Applies bold, italic, and underline formatting based on cell values
+- **Custom Menu Integration**: Easy-to-use menu in Google Sheets
+- **Range Support**: Works on single cells or multiple selected cells
 
 ## Setup
 
@@ -17,182 +18,134 @@ A collection of utility functions for Google Spreadsheet operations, with a focu
 1. Go to [script.google.com](https://script.google.com)
 2. Create a new project
 3. Copy the contents of `colour-by-value.js` into your script editor
-4. Save the project
+4. Save the project with a descriptive name (e.g., "Cell Color Formatter")
 
-### 2. Grant Permissions
+### 2. Link to Google Sheets
 
-When you first run any function, Google Apps Script will prompt you to grant necessary permissions to access your Google Sheets.
+1. Open your Google Sheets document
+2. Go to **Extensions** → **Apps Script**
+3. If you created the script separately, you'll need to copy the code into the Apps Script editor for your specific sheet
+4. Save the script
 
-## Usage Examples
+### 3. Grant Permissions
 
-### Basic Cell Coloring
+When you first run any function, Google Apps Script will prompt you to grant necessary permissions to access your Google Sheets. Click "Review permissions" and authorize the script.
 
-```javascript
-// Color a single cell based on its value
-colourCellByValue("Sheet1", "A1", "Error", {
-  background: "#ff0000",  // Red background
-  font: "#ffffff"         // White text
-});
-```
+### 4. Custom Menu
 
-### Conditional Formatting
+After saving the script, refresh your Google Sheets document. You should see a new **"Cell Formatting"** menu in the menu bar with two options:
+- **Random Colour** - Applies colors based on cell values
+- **Random Format** - Applies colors and text formatting based on cell values
 
-```javascript
-// Apply conditional formatting to a range
-const conditions = [
-  {
-    condition: "NUMBER_GREATER_THAN",
-    values: [100],
-    background: "#00ff00",  // Green for values > 100
-    font: "#000000"
-  },
-  {
-    condition: "NUMBER_LESS_THAN",
-    values: [50],
-    background: "#ff0000",  // Red for values < 50
-    font: "#ffffff"
-  }
-];
+## Usage
 
-applyConditionalFormatting("Sheet1", "A1:A10", conditions);
-```
+### Using the Custom Menu (Recommended)
 
-### Data Operations
+1. **Select cells** in your Google Sheets document that you want to format
+2. **Click on "Cell Formatting"** in the menu bar
+3. **Choose an option**:
+   - **Random Colour**: Applies background colors and contrasting text colors based on cell values
+   - **Random Format**: Applies colors plus random text formatting (bold, italic, underline) based on cell values
 
-```javascript
-// Get a cell value
-const value = getCellValue("Sheet1", "A1");
+### How It Works
 
-// Set multiple values at once
-const values = [
-  ["Name", "Age", "City"],
-  ["John", 25, "New York"],
-  ["Jane", 30, "London"]
-];
-setRangeValues("Sheet1", "A1:C3", values);
-```
+The script uses MD5 hashing to ensure **consistent results**:
+- The same cell value will always get the same color and formatting
+- Different values get different colors from a palette of 32 pastel colors
+- Text colors are automatically chosen for optimal contrast
+- Empty cells remain white
 
-### Custom Functions
+### Example Results
+
+| Cell Value | Background Color | Text Color | Formatting |
+|------------|------------------|------------|------------|
+| "Apple"    | Light Pink       | Dark Gray  | Bold       |
+| "Banana"   | Light Green      | Dark Gray  | Normal     |
+| "Cherry"   | Light Blue       | Dark Gray  | Italic     |
+| "Apple"    | Light Pink       | Dark Gray  | Bold       |
+
+*Note: "Apple" always gets the same formatting because the script uses consistent hashing*
+
+### Manual Function Calls
+
+You can also call the functions directly from the Apps Script editor:
 
 ```javascript
-function highlightErrors() {
-  const sheetName = "Data";
-  const dataRange = "A1:A100";
-  
-  // Get all values in the range
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  const values = sheet.getRange(dataRange).getValues();
-  
-  // Check each cell and colour if it contains "ERROR"
-  values.forEach((row, index) => {
-    if (row[0] && row[0].toString().toUpperCase().includes("ERROR")) {
-      const cellAddress = `A${index + 1}`;
-      colourCellByValue(sheetName, cellAddress, row[0], {
-        background: "#ffcccc",
-        font: "#cc0000"
-      });
-    }
-  });
-}
-```
+// Apply colors to selected cells
+randomColour();
 
-### Sheet Management
-
-```javascript
-// Create a new sheet if it doesn't exist
-const newSheet = createSheetIfNotExists("Analysis");
-
-// Get all sheet names
-const allSheets = getAllSheetNames();
-
-// Clear formatting from a range
-clearFormatting("Sheet1", "A1:A10");
+// Apply colors and formatting to selected cells  
+randomFormat();
 ```
 
 ## Available Functions
 
-### Core Functions
+### Main Functions
 
-- **`colourCellByValue(sheetName, cellAddress, value, colourRules)`** - Sets background and font colours based on cell values
-- **`applyConditionalFormatting(sheetName, range, conditions)`** - Applies conditional formatting rules to ranges
-- **`getCellValue(sheetName, cellAddress)`** - Retrieves values from specific cells
-- **`setRangeValues(sheetName, range, values)`** - Sets multiple cell values at once
-- **`clearFormatting(sheetName, range)`** - Removes formatting from ranges
+- **`onOpen()`** - Creates the custom "Cell Formatting" menu when the spreadsheet opens
+- **`randomColour()`** - Applies background colors and contrasting text colors to selected cells based on their values
+- **`randomFormat()`** - Applies colors plus random text formatting (bold, italic, underline) to selected cells based on their values
 
-### Sheet Management
+### Helper Functions
 
-- **`createSheetIfNotExists(sheetName)`** - Creates sheets if they don't exist
-- **`getAllSheetNames()`** - Lists all sheet names
-- **`deleteSheet(sheetName)`** - Removes sheets by name
+- **`getColorFromValue(value)`** - Generates a consistent color from a cell value using MD5 hashing
+- **`getContrastColor(backgroundColor)`** - Generates a contrasting text color for optimal readability
+- **`getRandomFormatting(value)`** - Generates random text formatting (bold, italic, underline) based on cell value using MD5 hashing
 
-## Running Functions
+## How the Color System Works
 
-### From Google Apps Script Editor
-1. Select a function from the dropdown
-2. Click the "Run" button
-3. Grant necessary permissions when prompted
+### Color Palette
+The script uses a carefully selected palette of 32 web-safe pastel colors:
+- Light pinks, greens, blues, yellows, purples, and cyans
+- All colors are pastel tones for easy reading
+- Colors are chosen using MD5 hash of the cell value
 
-### From Google Sheets
-1. Create custom functions in your script
-2. Use them in cells like: `=myCustomFunction()`
+### Text Formatting Probabilities
+When using "Random Format", the script applies formatting with these probabilities:
+- **Bold**: 40% chance
+- **Italic**: 30% chance  
+- **Underline**: 25% chance
 
-### As Triggers
-```javascript
-// Set up a trigger to run when the sheet is edited
-function setupTrigger() {
-  ScriptApp.newTrigger('highlightErrors')
-    .timeBased()
-    .everyMinutes(5)
-    .create();
-}
-```
+### Consistency Guarantee
+- Same input value = Same output formatting
+- Different values = Different formatting
+- Empty cells remain unformatted (white background)
 
 ## Common Use Cases
 
-### Data Validation Highlighting
-```javascript
-function highlightInvalidData() {
-  const sheetName = "Input";
-  const range = "B2:B20";
-  
-  const conditions = [
-    {
-      condition: "NUMBER_LESS_THAN",
-      values: [0],
-      background: "#ffcccc",
-      font: "#cc0000"
-    }
-  ];
-  
-  applyConditionalFormatting(sheetName, range, conditions);
-}
-```
+### Data Categorization
+Perfect for visually grouping similar data:
+- Product categories get consistent colors
+- Status values are easily distinguishable
+- Duplicate entries are immediately visible
 
-### Status-Based Coloring
-```javascript
-function colourByStatus() {
-  const statuses = ["Complete", "In Progress", "Pending"];
-  const colours = ["#d4edda", "#fff3cd", "#f8d7da"];
-  
-  // Apply colours based on status values
-  // Implementation depends on your specific data structure
-}
-```
+### Data Validation
+Use colors to highlight data patterns:
+- Duplicate values get the same color
+- Unique values get unique colors
+- Empty cells stay white for easy identification
+
+### Visual Organization
+Great for organizing spreadsheets:
+- Color-code by department, priority, or type
+- Make data more visually appealing
+- Improve readability of large datasets
 
 ## Best Practices
 
-1. **Always test functions** on a copy of your data first
-2. **Use descriptive sheet and range names** for clarity
-3. **Handle errors gracefully** - the functions include basic error handling
-4. **Batch operations** when possible to improve performance
-5. **Use triggers sparingly** to avoid hitting execution limits
+1. **Test on a copy first** - Always test on sample data before applying to important sheets
+2. **Select appropriate ranges** - Choose the exact cells you want to format
+3. **Use consistent data** - Ensure your data is clean and consistent for best results
+4. **Refresh after changes** - If you modify the script, refresh your Google Sheets document
+5. **Backup your data** - Keep backups of important spreadsheets before applying formatting
 
 ## Troubleshooting
 
-- **"Sheet not found" errors**: Check that sheet names match exactly (case-sensitive)
-- **Permission errors**: Make sure you've granted necessary permissions
-- **Execution timeouts**: Break large operations into smaller chunks
-- **Format not applying**: Check that colour values are valid (hex codes or standard colour names)
+- **Menu not appearing**: Refresh your Google Sheets document after saving the script
+- **No colors applied**: Make sure you have cells selected before running the function
+- **Permission errors**: Grant necessary permissions when prompted by Google Apps Script
+- **Script not running**: Check the Apps Script editor for any error messages
+- **Inconsistent results**: Ensure your cell values are exactly the same (including spaces and case)
 
 ## License
 
