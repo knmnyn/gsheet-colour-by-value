@@ -1,4 +1,4 @@
-# 🎨 gsheet-colour-cell
+# 🎨 gsheet-colour-by-value
 
 A Google Apps Script utility that automatically applies colors and formatting to spreadsheet cells based on their values. The script uses MD5 hashing to ensure consistent coloring - the same value will always get the same color and formatting.
 
