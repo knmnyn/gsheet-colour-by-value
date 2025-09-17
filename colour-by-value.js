@@ -407,3 +407,400 @@ function dateColourCondition(cellValue, targetDate, operator) {
     return false;
   }
 }
+
+/**
+ * Applies comprehensive formatting style based on cell value
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} cellAddress - The cell address (e.g., "A1")
+ * @param {*} value - The value to set in the cell
+ * @param {Object} styleRules - Object containing style rules
+ * @param {string} styleRules.background - Background colour (hex code or colour name)
+ * @param {string} styleRules.font - Font colour (hex code or colour name)
+ * @param {boolean} styleRules.bold - Whether text should be bold
+ * @param {boolean} styleRules.italic - Whether text should be italic
+ * @param {boolean} styleRules.underline - Whether text should be underlined
+ * @param {boolean} styleRules.strikethrough - Whether text should be struck through
+ * @param {string} styleRules.fontSize - Font size (e.g., "12", "14")
+ * @param {string} styleRules.fontFamily - Font family (e.g., "Arial", "Times New Roman")
+ * @param {string} styleRules.horizontalAlignment - Horizontal alignment ("left", "center", "right")
+ * @param {string} styleRules.verticalAlignment - Vertical alignment ("top", "middle", "bottom")
+ */
+function formatCellByValue(sheetName, cellAddress, value, styleRules) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found`);
+  }
+  
+  const cell = sheet.getRange(cellAddress);
+  
+  // Set value if provided
+  if (value !== undefined && value !== null) {
+    const currentValue = cell.getValue();
+    if (currentValue !== value) {
+      cell.setValue(value);
+    }
+  }
+  
+  // Apply background colour
+  if (styleRules.background) {
+    cell.setBackground(styleRules.background);
+  }
+  
+  // Apply font colour
+  if (styleRules.font) {
+    cell.setFontColor(styleRules.font);
+  }
+  
+  // Apply font weight (bold)
+  if (styleRules.bold !== undefined) {
+    cell.setFontWeight(styleRules.bold ? "bold" : "normal");
+  }
+  
+  // Apply font style (italic)
+  if (styleRules.italic !== undefined) {
+    cell.setFontStyle(styleRules.italic ? "italic" : "normal");
+  }
+  
+  // Apply underline
+  if (styleRules.underline !== undefined) {
+    cell.setFontLine(styleRules.underline ? "underline" : "none");
+  }
+  
+  // Apply strikethrough
+  if (styleRules.strikethrough !== undefined) {
+    cell.setFontLine(styleRules.strikethrough ? "line-through" : "none");
+  }
+  
+  // Apply font size
+  if (styleRules.fontSize) {
+    cell.setFontSize(parseInt(styleRules.fontSize));
+  }
+  
+  // Apply font family
+  if (styleRules.fontFamily) {
+    cell.setFontFamily(styleRules.fontFamily);
+  }
+  
+  // Apply horizontal alignment
+  if (styleRules.horizontalAlignment) {
+    cell.setHorizontalAlignment(styleRules.horizontalAlignment);
+  }
+  
+  // Apply vertical alignment
+  if (styleRules.verticalAlignment) {
+    cell.setVerticalAlignment(styleRules.verticalAlignment);
+  }
+}
+
+/**
+ * Custom function to apply comprehensive formatting from Google Sheets (formatting only)
+ * Usage: =formatCell("Sheet1", "A1", "Error", "#ff0000", "#ffffff", true, false, true)
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} cellAddress - The cell address
+ * @param {string} value - The value to set
+ * @param {string} backgroundColour - Background colour
+ * @param {string} fontColour - Font colour
+ * @param {boolean} bold - Whether to make text bold
+ * @param {boolean} italic - Whether to make text italic
+ * @param {boolean} underline - Whether to underline text
+ * @returns {string} Success message
+ */
+function formatCell(sheetName, cellAddress, value, backgroundColour, fontColour, bold, italic, underline) {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    if (!sheet) {
+      return "Error: Sheet not found";
+    }
+    
+    const cell = sheet.getRange(cellAddress);
+    
+    // Apply formatting only (no setValue to avoid permission issues)
+    if (backgroundColour) {
+      cell.setBackground(backgroundColour);
+    }
+    
+    if (fontColour) {
+      cell.setFontColor(fontColour);
+    }
+    
+    if (bold !== undefined) {
+      cell.setFontWeight(bold ? "bold" : "normal");
+    }
+    
+    if (italic !== undefined) {
+      cell.setFontStyle(italic ? "italic" : "normal");
+    }
+    
+    if (underline !== undefined) {
+      cell.setFontLine(underline ? "underline" : "none");
+    }
+    
+    return "Cell formatted successfully";
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * Custom function for status-based formatting (formatting only)
+ * Usage: =formatByStatus("Sheet1", "A1", "Complete")
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} cellAddress - The cell address
+ * @param {string} status - The status value
+ * @returns {string} Success message
+ */
+function formatByStatus(sheetName, cellAddress, status) {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    if (!sheet) {
+      return "Error: Sheet not found";
+    }
+    
+    const cell = sheet.getRange(cellAddress);
+    let backgroundColour, fontColour, bold, italic, underline;
+    
+    switch (status.toLowerCase()) {
+      case "complete":
+      case "done":
+      case "finished":
+        backgroundColour = "#d4edda";
+        fontColour = "#155724";
+        bold = true;
+        italic = false;
+        break;
+      case "in progress":
+      case "pending":
+      case "working":
+        backgroundColour = "#fff3cd";
+        fontColour = "#856404";
+        bold = false;
+        italic = true;
+        break;
+      case "error":
+      case "failed":
+      case "issue":
+        backgroundColour = "#f8d7da";
+        fontColour = "#721c24";
+        bold = true;
+        underline = true;
+        break;
+      case "warning":
+      case "caution":
+        backgroundColour = "#ffeaa7";
+        fontColour = "#6c5ce7";
+        bold = true;
+        italic = true;
+        break;
+      default:
+        backgroundColour = "#f8f9fa";
+        fontColour = "#495057";
+        bold = false;
+        italic = false;
+    }
+    
+    // Apply formatting only (no setValue to avoid permission issues)
+    cell.setBackground(backgroundColour);
+    cell.setFontColor(fontColour);
+    
+    if (bold !== undefined) {
+      cell.setFontWeight(bold ? "bold" : "normal");
+    }
+    
+    if (italic !== undefined) {
+      cell.setFontStyle(italic ? "italic" : "normal");
+    }
+    
+    if (underline !== undefined) {
+      cell.setFontLine(underline ? "underline" : "none");
+    }
+    
+    return "Status formatted successfully";
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * Generates a consistent random colour based on a string value
+ * @param {string} value - The value to generate a colour for
+ * @param {string} type - "background" or "foreground"
+ * @returns {string} Hex colour code
+ */
+function generateColourFromValue(value, type = "background") {
+  // Convert value to string and create a hash
+  const str = value.toString();
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use absolute value to ensure positive
+  hash = Math.abs(hash);
+  
+  if (type === "background") {
+    // Generate bright, vibrant background colours
+    const hue = hash % 360;
+    const saturation = 70 + (hash % 30); // 70-100% saturation
+    const lightness = 45 + (hash % 20); // 45-65% lightness for good contrast
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  } else {
+    // Generate contrasting foreground colours
+    const hue = (hash + 180) % 360; // Opposite hue for contrast
+    const saturation = 80 + (hash % 20); // 80-100% saturation
+    const lightness = hash % 2 === 0 ? 15 : 85; // Very dark or very light
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
+}
+
+/**
+ * Applies random high contrast colours based on cell value
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} cellAddress - The cell address (e.g., "A1")
+ * @param {*} value - The value to set in the cell
+ * @param {Object} options - Optional styling options
+ * @param {boolean} options.bold - Whether to make text bold
+ * @param {boolean} options.italic - Whether to make text italic
+ * @param {string} options.fontSize - Font size
+ */
+function colourCellByValueRandom(sheetName, cellAddress, value, options = {}) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found`);
+  }
+  
+  const cell = sheet.getRange(cellAddress);
+  
+  // Set value if provided
+  if (value !== undefined && value !== null) {
+    const currentValue = cell.getValue();
+    if (currentValue !== value) {
+      cell.setValue(value);
+    }
+  }
+  
+  // Generate consistent colours based on value
+  const backgroundColour = generateColourFromValue(value, "background");
+  const foregroundColour = generateColourFromValue(value, "foreground");
+  
+  // Apply colours
+  cell.setBackground(backgroundColour);
+  cell.setFontColor(foregroundColour);
+  
+  // Apply additional styling options
+  if (options.bold !== undefined) {
+    cell.setFontWeight(options.bold ? "bold" : "normal");
+  }
+  
+  if (options.italic !== undefined) {
+    cell.setFontStyle(options.italic ? "italic" : "normal");
+  }
+  
+  if (options.fontSize) {
+    cell.setFontSize(parseInt(options.fontSize));
+  }
+}
+
+/**
+ * Applies random high contrast colours to a range based on cell values
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} range - The range to format (e.g., "A1:A10")
+ * @param {Object} options - Optional styling options
+ */
+function colourRangeByValueRandom(sheetName, range, options = {}) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found`);
+  }
+  
+  const rangeObj = sheet.getRange(range);
+  const values = rangeObj.getValues();
+  
+  values.forEach((row, rowIndex) => {
+    row.forEach((cellValue, colIndex) => {
+      if (cellValue !== null && cellValue !== undefined && cellValue !== "") {
+        const cellAddress = rangeObj.getCell(rowIndex + 1, colIndex + 1).getA1Notation();
+        colourCellByValueRandom(sheetName, cellAddress, cellValue, options);
+      }
+    });
+  });
+}
+
+/**
+ * Custom function for random high contrast colouring from Google Sheets (formatting only)
+ * Usage: =colourCellRandom("Sheet1", "A1", "Error")
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} cellAddress - The cell address
+ * @param {string} value - The value to set
+ * @param {boolean} bold - Whether to make text bold
+ * @returns {string} Success message
+ */
+function colourCellRandom(sheetName, cellAddress, value, bold = true) {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    if (!sheet) {
+      return "Error: Sheet not found";
+    }
+    
+    const cell = sheet.getRange(cellAddress);
+    
+    // Generate consistent colours based on value
+    const backgroundColour = generateColourFromValue(value, "background");
+    const foregroundColour = generateColourFromValue(value, "foreground");
+    
+    // Apply colours only (no setValue to avoid permission issues)
+    cell.setBackground(backgroundColour);
+    cell.setFontColor(foregroundColour);
+    
+    // Apply additional styling options
+    if (bold) {
+      cell.setFontWeight("bold");
+    }
+    
+    return "Cell coloured with random high contrast colours";
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * Custom function for random high contrast colouring of a range
+ * Usage: =colourRangeRandom("Sheet1", "A1:A10")
+ * @param {string} sheetName - The name of the sheet
+ * @param {string} range - The range to colour
+ * @param {boolean} bold - Whether to make text bold
+ * @returns {string} Success message
+ */
+function colourRangeRandom(sheetName, range, bold = true) {
+  try {
+    const options = { bold: bold };
+    colourRangeByValueRandom(sheetName, range, options);
+    return "Range coloured with random high contrast colours";
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * Custom formula for conditional formatting with random high contrast colours
+ * Returns TRUE if the cell has a value (for conditional formatting)
+ * Usage in conditional formatting: =hasValueRandom(A1)
+ * @param {*} cellValue - The value of the cell to check
+ * @returns {boolean} TRUE if cell has a value
+ */
+function hasValueRandom(cellValue) {
+  return cellValue !== null && cellValue !== undefined && cellValue !== "";
+}
+
+/**
+ * Custom formula for specific value random colouring
+ * Usage in conditional formatting: =valueRandomColour(A1, "Error")
+ * @param {*} cellValue - The value of the cell to check
+ * @param {string} targetValue - The value to match
+ * @returns {boolean} TRUE if cell value matches target
+ */
+function valueRandomColour(cellValue, targetValue) {
+  return cellValue !== null && cellValue !== undefined && 
+         cellValue.toString().toLowerCase() === targetValue.toLowerCase();
+}
