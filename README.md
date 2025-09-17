@@ -16,7 +16,7 @@ A collection of utility functions for Google Spreadsheet operations, with a focu
 
 1. Go to [script.google.com](https://script.google.com)
 2. Create a new project
-3. Copy the contents of `gsheet-utils.js` into your script editor
+3. Copy the contents of `colour-by-value.js` into your script editor
 4. Save the project
 
 ### 2. Grant Permissions
