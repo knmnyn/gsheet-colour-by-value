@@ -1,6 +1,6 @@
 # gsheet-colour-cell
 
-A collection of utility functions for Google Spreadsheet operations, with a focus on cell coloring and formatting based on values.
+A collection of utility functions for Google Spreadsheet operations, with a focus on cell colouring and formatting based on values.
 
 ## Features
 
@@ -29,7 +29,7 @@ When you first run any function, Google Apps Script will prompt you to grant nec
 
 ```javascript
 // Color a single cell based on its value
-colorCellByValue("Sheet1", "A1", "Error", {
+colourCellByValue("Sheet1", "A1", "Error", {
   background: "#ff0000",  // Red background
   font: "#ffffff"         // White text
 });
@@ -83,11 +83,11 @@ function highlightErrors() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   const values = sheet.getRange(dataRange).getValues();
   
-  // Check each cell and color if it contains "ERROR"
+  // Check each cell and colour if it contains "ERROR"
   values.forEach((row, index) => {
     if (row[0] && row[0].toString().toUpperCase().includes("ERROR")) {
       const cellAddress = `A${index + 1}`;
-      colorCellByValue(sheetName, cellAddress, row[0], {
+      colourCellByValue(sheetName, cellAddress, row[0], {
         background: "#ffcccc",
         font: "#cc0000"
       });
@@ -113,7 +113,7 @@ clearFormatting("Sheet1", "A1:A10");
 
 ### Core Functions
 
-- **`colorCellByValue(sheetName, cellAddress, value, colorRules)`** - Sets background and font colors based on cell values
+- **`colourCellByValue(sheetName, cellAddress, value, colourRules)`** - Sets background and font colours based on cell values
 - **`applyConditionalFormatting(sheetName, range, conditions)`** - Applies conditional formatting rules to ranges
 - **`getCellValue(sheetName, cellAddress)`** - Retrieves values from specific cells
 - **`setRangeValues(sheetName, range, values)`** - Sets multiple cell values at once
@@ -170,11 +170,11 @@ function highlightInvalidData() {
 
 ### Status-Based Coloring
 ```javascript
-function colorByStatus() {
+function colourByStatus() {
   const statuses = ["Complete", "In Progress", "Pending"];
-  const colors = ["#d4edda", "#fff3cd", "#f8d7da"];
+  const colours = ["#d4edda", "#fff3cd", "#f8d7da"];
   
-  // Apply colors based on status values
+  // Apply colours based on status values
   // Implementation depends on your specific data structure
 }
 ```
@@ -192,7 +192,7 @@ function colorByStatus() {
 - **"Sheet not found" errors**: Check that sheet names match exactly (case-sensitive)
 - **Permission errors**: Make sure you've granted necessary permissions
 - **Execution timeouts**: Break large operations into smaller chunks
-- **Format not applying**: Check that color values are valid (hex codes or standard color names)
+- **Format not applying**: Check that colour values are valid (hex codes or standard colour names)
 
 ## License
 
