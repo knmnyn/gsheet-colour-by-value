@@ -10,7 +10,7 @@ function onOpen() {
 }
 
 /**
- * Applies colors based on the cell value to the selected cell(s)
+ * Applies colours based on the cell value to the selected cell(s)
  */
 function randomColour() {
   const sheet = SpreadsheetApp.getActiveSheet();
@@ -19,31 +19,31 @@ function randomColour() {
   // Get cell values
   const values = range.getValues();
   
-  // Apply colors based on each cell's value
+  // Apply colours based on each cell's value
   for (let i = 0; i < values.length; i++) {
     for (let j = 0; j < values[i].length; j++) {
       const cellValue = values[i][j];
       const cell = range.getCell(i + 1, j + 1);
       
-      // Calculate colors based on cell value
-      const backgroundColor = getColorFromValue(cellValue);
-      const textColor = getContrastColor(backgroundColor);
+      // Calculate colours based on cell value
+      const backgroundColour = getColourFromValue(cellValue);
+      const textColour = getContrastColour(backgroundColour);
       
-      // Apply colors to the cell
-      cell.setBackground(backgroundColor);
-      cell.setFontColor(textColor);      
+      // Apply colours to the cell
+      cell.setBackground(backgroundColour);
+      cell.setFontColor(textColour);      
     }
   }
 }
 
 /**
- * Applies colors and random text formatting based on the cell value to the selected cell(s)
+ * Applies colours and random text formatting based on the cell value to the selected cell(s)
  */
 function randomFormat() {
   const sheet = SpreadsheetApp.getActiveSheet();
   const range = sheet.getActiveRange();
   
-  // First apply colors using the existing randomColour function
+  // First apply colours using the existing randomColour function
   randomColour();
   
   // Get cell values for formatting
@@ -68,23 +68,23 @@ function randomFormat() {
       if (formatting.underline) formatDesc.push('underline');
       const formatString = formatDesc.length > 0 ? ` (${formatDesc.join(', ')})` : '';
       
-      // Get the background color for display
-      const backgroundColor = getColorFromValue(cellValue);
+      // Get the background colour for display
+      const backgroundColour = getColourFromValue(cellValue);
     }
   }
 }
 
 /**
- * Generates a color based on the cell value
+ * Generates a colour based on the cell value
  */
-function getColorFromValue(value) {
+function getColourFromValue(value) {
   if (value === null || value === undefined || value === '') {
     return '#FFFFFF'; // White for empty cells
   }
   
-  // Use MD5 hash to pick from websafe pastel colors
+  // Use MD5 hash to pick from websafe pastel colours
   const str = String(value);
-  const pastelColors = [
+  const pastelColours = [
     '#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFB3FF', '#B3FFF9',
     '#FFD1BA', '#E5FFBA', '#BAC3FF', '#FFBAD4', '#BAFFCE', '#BAF0FF',
     '#FFF7BA', '#FFB3F1', '#B3FFE9', '#FFBAC9', '#D4FFBA', '#BAD6FF',
@@ -93,19 +93,19 @@ function getColorFromValue(value) {
     '#FFCEBA', '#D1B3FF'
   ];
   
-  // Get MD5 hash and use first 5 bits (0-31) to select color
+  // Get MD5 hash and use first 5 bits (0-31) to select colour
   const hashBytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, str);
-  const colorIndex = hashBytes[0] & 0x1F; // Take first byte & mask to get 0-31
+  const colourIndex = hashBytes[0] & 0x1F; // Take first byte & mask to get 0-31
   
-  // Return the selected pastel color
-  return pastelColors[colorIndex];
+  // Return the selected pastel colour
+  return pastelColours[colourIndex];
 }
 
 /**
- * Generates a contrasting text color for the given background color
+ * Generates a contrasting text colour for the given background colour
  */
-function getContrastColor(backgroundColor) {
-  // Array of 16 dark shades for text colors
+function getContrastColour(backgroundColour) {
+  // Array of 16 dark shades for text colours
   const darkShades = [
     '#1A1A1A', '#2B2B2B', '#3C3C3C', '#4D4D4D',
     '#262626', '#333333', '#404040', '#595959',
@@ -113,13 +113,13 @@ function getContrastColor(backgroundColor) {
     '#232323', '#303030', '#3E3E3E', '#4B4B4B'
   ];
 
-  // Get MD5 hash of the background color
-  const hashBytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, backgroundColor);
+  // Get MD5 hash of the background colour
+  const hashBytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, backgroundColour);
   
   // Use first 4 bits (0-15) to select dark shade
-  const colorIndex = hashBytes[0] & 0x0F;
+  const colourIndex = hashBytes[0] & 0x0F;
   
-  return darkShades[colorIndex];
+  return darkShades[colourIndex];
 }
 
 /**
